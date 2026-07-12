@@ -22,8 +22,9 @@
           <thead>
             <tr>
               <th>Nome</th>
+              <th>Codice Fiscale</th>
+              <th>Partita IVA</th>
               <th>Email</th>
-              <th>Telefono</th>
               <th>Società</th>
               <th class="actions-col">Azioni</th>
             </tr>
@@ -32,8 +33,9 @@
             @for (cliente of clienti(); track cliente.id) {
               <tr [class.row-active]="cliente.id === editingId()">
                 <td>{{ cliente.nome }} {{ cliente.cognome }}</td>
+                <td>{{ cliente.codiceFiscale || '—' }}</td>
+                <td>{{ cliente.partitaIva || '—' }}</td>
                 <td>{{ cliente.email || '—' }}</td>
-                <td>{{ cliente.telefono || '—' }}</td>
                 <td>{{ cliente.societa || '—' }}</td>
                 <td class="actions-col">
                   <button type="button" class="btn small" (click)="startEdit(cliente)">
@@ -66,6 +68,33 @@
       <label>
         Cognome *
         <input name="cognome" [(ngModel)]="form().cognome" required autocomplete="off" />
+      </label>
+
+      <label>
+        Codice Fiscale *
+        <input
+          name="codiceFiscale"
+          [(ngModel)]="form().codiceFiscale"
+          required
+          maxlength="16"
+          autocomplete="off"
+          style="text-transform: uppercase"
+        />
+      </label>
+
+      <label>
+        Partita IVA
+        <input name="partitaIva" [(ngModel)]="form().partitaIva" maxlength="11" autocomplete="off" />
+      </label>
+
+      <label>
+        PEC
+        <input name="pec" type="email" [(ngModel)]="form().pec" autocomplete="off" />
+      </label>
+
+      <label>
+        Codice SDI
+        <input name="codiceSdi" [(ngModel)]="form().codiceSdi" maxlength="7" autocomplete="off" />
       </label>
 
       <label>

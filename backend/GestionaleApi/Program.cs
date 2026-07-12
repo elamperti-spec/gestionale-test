@@ -32,6 +32,10 @@ var clienti = new List<Cliente>
         Id = 1,
         Nome = "Mario",
         Cognome = "Rossi",
+        CodiceFiscale = "RSSMRA80A01H501U",
+        PartitaIva = "01234567890",
+        Pec = "mario.rossi@pec.it",
+        CodiceSdi = "ABCDEFG",
         Email = "mario.rossi@example.com",
         Telefono = "3331234567",
         Societa = "Rossi Srl",
@@ -42,6 +46,10 @@ var clienti = new List<Cliente>
         Id = 2,
         Nome = "Laura",
         Cognome = "Bianchi",
+        CodiceFiscale = "BNCLRA85M41F205X",
+        PartitaIva = "09876543210",
+        Pec = "laura.bianchi@pec.it",
+        CodiceSdi = "0000000",
         Email = "laura.bianchi@example.com",
         Telefono = "3337654321",
         Societa = "Bianchi Consulting",
@@ -61,6 +69,19 @@ app.MapGet("/api/clienti/{id}", (int id) =>
 
 app.MapPost("/api/clienti", (Cliente cliente) =>
 {
+    if (string.IsNullOrWhiteSpace(cliente.CodiceFiscale))
+    {
+        return Results.BadRequest(new { message = "Il codice fiscale è obbligatorio." });
+    }
+
+    var cf = cliente.CodiceFiscale.Trim();
+
+    if (clienti.Any(c => string.Equals(c.CodiceFiscale?.Trim(), cf, StringComparison.OrdinalIgnoreCase)))
+    {
+        return Results.Conflict(new { message = $"Esiste già un cliente con il codice fiscale {cf}." });
+    }
+
+    cliente.CodiceFiscale = cf;
     cliente.Id = clienti.Count == 0 ? 1 : clienti.Max(c => c.Id) + 1;
     clienti.Add(cliente);
     return Results.Created($"/api/clienti/{cliente.Id}", cliente);
@@ -75,8 +96,24 @@ app.MapPut("/api/clienti/{id}", (int id, Cliente clienteAggiornato) =>
         return Results.NotFound();
     }
 
+    if (string.IsNullOrWhiteSpace(clienteAggiornato.CodiceFiscale))
+    {
+        return Results.BadRequest(new { message = "Il codice fiscale è obbligatorio." });
+    }
+
+    var cf = clienteAggiornato.CodiceFiscale.Trim();
+
+    if (clienti.Any(c => c.Id != id && string.Equals(c.CodiceFiscale?.Trim(), cf, StringComparison.OrdinalIgnoreCase)))
+    {
+        return Results.Conflict(new { message = $"Esiste già un cliente con il codice fiscale {cf}." });
+    }
+
     cliente.Nome = clienteAggiornato.Nome;
     cliente.Cognome = clienteAggiornato.Cognome;
+    cliente.CodiceFiscale = cf;
+    cliente.PartitaIva = clienteAggiornato.PartitaIva;
+    cliente.Pec = clienteAggiornato.Pec;
+    cliente.CodiceSdi = clienteAggiornato.CodiceSdi;
     cliente.Email = clienteAggiornato.Email;
     cliente.Telefono = clienteAggiornato.Telefono;
     cliente.Societa = clienteAggiornato.Societa;

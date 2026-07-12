@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
@@ -5,7 +6,18 @@ import { Cliente, ClienteInput } from '../models/cliente';
 import { ClienteService } from '../services/cliente.service';
 
 function emptyForm(): ClienteInput {
-  return { nome: '', cognome: '', email: '', telefono: '', societa: '', note: '' };
+  return {
+    nome: '',
+    cognome: '',
+    codiceFiscale: '',
+    partitaIva: '',
+    pec: '',
+    codiceSdi: '',
+    email: '',
+    telefono: '',
+    societa: '',
+    note: '',
+  };
 }
 
 @Component({
@@ -58,6 +70,10 @@ export class Clienti implements OnInit {
     this.form.set({
       nome: cliente.nome,
       cognome: cliente.cognome,
+      codiceFiscale: cliente.codiceFiscale ?? '',
+      partitaIva: cliente.partitaIva ?? '',
+      pec: cliente.pec ?? '',
+      codiceSdi: cliente.codiceSdi ?? '',
       email: cliente.email ?? '',
       telefono: cliente.telefono ?? '',
       societa: cliente.societa ?? '',
@@ -77,10 +93,27 @@ export class Clienti implements OnInit {
       return;
     }
 
+    const cf = (payload.codiceFiscale ?? '').trim();
+    if (!cf) {
+      this.error.set('Il codice fiscale è obbligatorio.');
+      return;
+    }
+
+    const id = this.editingId();
+
+    // Controllo anti-duplicato lato client (feedback immediato). Il backend
+    // resta la fonte autorevole e blocca comunque i duplicati (409).
+    const duplicato = this.clienti().some(
+      (c) => c.id !== id && (c.codiceFiscale ?? '').trim().toUpperCase() === cf.toUpperCase(),
+    );
+    if (duplicato) {
+      this.error.set(`Esiste già un cliente con il codice fiscale ${cf.toUpperCase()}.`);
+      return;
+    }
+
     this.saving.set(true);
     this.error.set(null);
 
-    const id = this.editingId();
     const request$ =
       id === null ? this.service.create(payload) : this.service.update(id, payload);
 
@@ -90,8 +123,8 @@ export class Clienti implements OnInit {
         this.startCreate();
         this.load();
       },
-      error: () => {
-        this.error.set('Salvataggio non riuscito. Riprova.');
+      error: (err: unknown) => {
+        this.error.set(this.extractError(err, 'Salvataggio non riuscito. Riprova.'));
         this.saving.set(false);
       },
     });
@@ -111,5 +144,16 @@ export class Clienti implements OnInit {
       },
       error: () => this.error.set('Eliminazione non riuscita. Riprova.'),
     });
+  }
+
+  /** Estrae il messaggio d'errore restituito dal backend (es. codice fiscale duplicato). */
+  private extractError(err: unknown, fallback: string): string {
+    if (err instanceof HttpErrorResponse && err.error && typeof err.error === 'object') {
+      const message = (err.error as { message?: string }).message;
+      if (message) {
+        return message;
+      }
+    }
+    return fallback;
   }
 }
