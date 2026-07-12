@@ -1,0 +1,16 @@
+[Unit]
+Description=Gestionale Clienti - Backend API (.NET) su porta 5003
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/adminai/progetti-ai/gestionale-test/backend/GestionaleApi/publish
+ExecStart=/usr/bin/dotnet /home/adminai/progetti-ai/gestionale-test/backend/GestionaleApi/publish/GestionaleApi.dll
+Environment=ASPNETCORE_URLS=http://0.0.0.0:5003
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

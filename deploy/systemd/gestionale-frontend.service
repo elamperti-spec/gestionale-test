@@ -1,0 +1,16 @@
+[Unit]
+Description=Gestionale Clienti - Frontend Angular (ng serve) su porta 4200
+After=network-online.target gestionale-backend.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/adminai/progetti-ai/gestionale-test/frontend/gestionale-web
+ExecStart=/usr/bin/npm start -- --host 0.0.0.0 --port 4200
+Restart=on-failure
+RestartSec=10
+# ng serve compila all'avvio: diamo tempo prima di considerarlo attivo/fallito
+TimeoutStartSec=180
+
+[Install]
+WantedBy=default.target
