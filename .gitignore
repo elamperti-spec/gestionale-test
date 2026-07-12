@@ -1,6 +1,7 @@
 # ---- .NET / backend ----
 bin/
 obj/
+publish/
 *.user
 [Bb]in/
 [Oo]bj/
