@@ -10,9 +10,9 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy(CorsPolicy, policy =>
     {
-        policy.WithOrigins(
-                "http://localhost:4200",
-                "https://localhost:4200")
+        // Dev: il frontend può essere servito da localhost, dal tunnel VS Code
+        // o dall'IP di rete del server (bind 0.0.0.0), quindi accettiamo qualsiasi origine.
+        policy.AllowAnyOrigin()
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
