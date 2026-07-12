@@ -1,0 +1,101 @@
+<section class="layout">
+  <!-- Elenco clienti -->
+  <div class="panel list-panel">
+    <div class="panel-header">
+      <h2>Clienti</h2>
+      <button type="button" class="btn ghost" (click)="load()" [disabled]="loading()">
+        Aggiorna
+      </button>
+    </div>
+
+    @if (error()) {
+      <p class="alert error">{{ error() }}</p>
+    }
+
+    @if (loading()) {
+      <p class="muted">Caricamento in corso…</p>
+    } @else if (clienti().length === 0) {
+      <p class="muted">Nessun cliente presente. Aggiungine uno dal modulo a fianco.</p>
+    } @else {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Email</th>
+              <th>Telefono</th>
+              <th>Società</th>
+              <th class="actions-col">Azioni</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (cliente of clienti(); track cliente.id) {
+              <tr [class.row-active]="cliente.id === editingId()">
+                <td>{{ cliente.nome }} {{ cliente.cognome }}</td>
+                <td>{{ cliente.email || '—' }}</td>
+                <td>{{ cliente.telefono || '—' }}</td>
+                <td>{{ cliente.societa || '—' }}</td>
+                <td class="actions-col">
+                  <button type="button" class="btn small" (click)="startEdit(cliente)">
+                    Modifica
+                  </button>
+                  <button type="button" class="btn small danger" (click)="remove(cliente)">
+                    Elimina
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
+  <!-- Form nuovo / modifica cliente -->
+  <div class="panel form-panel">
+    <div class="panel-header">
+      <h2>{{ isEditing() ? 'Modifica cliente' : 'Nuovo cliente' }}</h2>
+    </div>
+
+    <form (ngSubmit)="save()" #f="ngForm">
+      <label>
+        Nome *
+        <input name="nome" [(ngModel)]="form().nome" required autocomplete="off" />
+      </label>
+
+      <label>
+        Cognome *
+        <input name="cognome" [(ngModel)]="form().cognome" required autocomplete="off" />
+      </label>
+
+      <label>
+        Email
+        <input name="email" type="email" [(ngModel)]="form().email" autocomplete="off" />
+      </label>
+
+      <label>
+        Telefono
+        <input name="telefono" [(ngModel)]="form().telefono" autocomplete="off" />
+      </label>
+
+      <label>
+        Società
+        <input name="societa" [(ngModel)]="form().societa" autocomplete="off" />
+      </label>
+
+      <label>
+        Note
+        <textarea name="note" rows="3" [(ngModel)]="form().note"></textarea>
+      </label>
+
+      <div class="form-actions">
+        <button type="submit" class="btn primary" [disabled]="saving()">
+          {{ saving() ? 'Salvataggio…' : isEditing() ? 'Aggiorna' : 'Crea' }}
+        </button>
+        @if (isEditing()) {
+          <button type="button" class="btn ghost" (click)="cancel()">Annulla</button>
+        }
+      </div>
+    </form>
+  </div>
+</section>

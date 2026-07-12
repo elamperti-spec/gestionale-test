@@ -1,0 +1,16 @@
+# ---- .NET / backend ----
+bin/
+obj/
+*.user
+[Bb]in/
+[Oo]bj/
+
+# ---- Node / Angular / frontend ----
+node_modules/
+dist/
+.angular/
+
+# ---- OS / editor ----
+.DS_Store
+Thumbs.db
+*.swp
