@@ -53,3 +53,16 @@ systemctl --user disable gestionale-backend gestionale-frontend
 
 - Frontend: http://<host>:4200/
 - Swagger:  http://<host>:5003/swagger/index.html
+
+## Accesso via tunnel VS Code / port forwarding
+
+Il dev server Angular è configurato (in `angular.json`) con:
+
+- `allowedHosts: true` → accetta anche host non-locali (es. `*.devtunnels.ms`),
+  altrimenti risponderebbe **403**;
+- `proxyConfig: proxy.conf.json` → le richieste a `/api` e `/swagger` sulla
+  porta 4200 vengono inoltrate al backend (5003).
+
+Il frontend usa quindi URL relativi (`apiBaseUrl` vuoto in `environment.ts`) e
+tutto passa dalla porta 4200. **Per usare l'app via tunnel basta inoltrare la
+sola porta 4200** (la 5003 serve solo per accedere a Swagger diretto).
